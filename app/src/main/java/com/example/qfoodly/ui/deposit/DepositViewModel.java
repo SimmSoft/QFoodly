@@ -10,7 +10,7 @@ public class DepositViewModel extends ViewModel {
 
     public DepositViewModel() {
         mText = new MutableLiveData<>();
-        mText.setValue("This is slideshow fragment");
+        mText.setValue("DEPOSIT");
     }
 
     public LiveData<String> getText() {
