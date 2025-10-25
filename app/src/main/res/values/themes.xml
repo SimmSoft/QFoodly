@@ -24,4 +24,9 @@
     <style name="Theme.QFoodly.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="Theme.QFoodly.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <style name="FabShapeAppearance" parent="ShapeAppearance.MaterialComponents.SmallComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">18dp</item>
+    </style>
 </resources>

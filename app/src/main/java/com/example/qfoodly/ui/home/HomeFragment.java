@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.res.ResourcesCompat;
@@ -18,6 +19,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.qfoodly.R;
 import com.example.qfoodly.databinding.FragmentHomeBinding;
 import com.example.qfoodly.databinding.ItemHomeBinding;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.Arrays;
 import java.util.List;
@@ -44,6 +46,14 @@ public class HomeFragment extends Fragment {
         ListAdapter<String, HomeViewHolder> adapter = new HomeAdapter();
         recyclerView.setAdapter(adapter);
         homeViewModel.getTexts().observe(getViewLifecycleOwner(), adapter::submitList);
+
+        FloatingActionButton fab = binding.fabAdd;
+        fab.setVisibility(View.VISIBLE);
+        fab.setOnClickListener(view -> {
+            // Handle FAB click
+            Toast.makeText(getContext(), "Add new item", Toast.LENGTH_SHORT).show();
+        });
+
         return root;
     }
 
