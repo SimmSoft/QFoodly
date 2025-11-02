@@ -19,7 +19,26 @@
         <action
             android:id="@+id/action_nav_home_to_nav_settings"
             app:destination="@id/nav_settings" />
+        <action
+            android:id="@+id/action_nav_home_to_nav_add_product"
+            app:destination="@id/nav_add_product" />
+        <action
+            android:id="@+id/action_nav_home_to_productDetailFragment"
+            app:destination="@id/productDetailFragment" />
     </fragment>
+
+    <fragment
+        android:id="@+id/productDetailFragment"
+        android:name="com.example.qfoodly.ui.detail.ProductDetailFragment"
+        android:label="@string/menu_product_details"
+        tools:layout="@layout/fragment_product_detail">
+
+        <argument
+            android:name="product"
+            app:argType="com.example.qfoodly.data.Product" />
+
+    </fragment>
+
 
     <fragment
         android:id="@+id/nav_deposit"
@@ -67,5 +86,15 @@
         <action
             android:id="@+id/action_nav_settings_to_nav_stats"
             app:destination="@id/nav_stats" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_add_product"
+        android:name="com.example.qfoodly.ui.addproduct.AddProductFragment"
+        android:label="@string/menu_add_product"
+        tools:layout="@layout/fragment_add_product" >
+        <action
+            android:id="@+id/action_nav_add_product_to_nav_home"
+            app:destination="@id/nav_home" />
     </fragment>
 </navigation>

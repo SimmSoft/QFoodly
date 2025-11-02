@@ -2,7 +2,7 @@
 <resources>
     <color name="primary">#003E23</color>
     <color name="primary_dark">#002D1A</color>
-    <color name="primary_light">#004F2B</color>
+    <color name="primary_light">#007F2B</color>
     <color name="teal_200">#FF03DAC5</color>
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
@@ -10,4 +10,6 @@
     <color name="background">#F5F5F5</color>
     <color name="background_dark">#121212</color>
     <color name="secondary_dark">#1d1d1d</color>
+    <color name="card_background_dark">#303030</color>
+    <color name="card_background_expired">#CC4040</color>
 </resources>
