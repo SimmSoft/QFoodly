@@ -1,22 +1,50 @@
 package com.example.qfoodly.ui.home;
 
+import android.app.Application;
+
+import androidx.annotation.NonNull;
+import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
 
-import java.util.ArrayList;
+import com.example.qfoodly.data.Product;
+import com.example.qfoodly.data.ProductDataSource;
+
 import java.util.List;
 
-public class HomeViewModel extends ViewModel {
+public class HomeViewModel extends AndroidViewModel {
 
-    private final MutableLiveData<List<String>> mTexts;
+    private final ProductDataSource dataSource;
+    private final MutableLiveData<List<Product>> _products = new MutableLiveData<>();
+    private final MutableLiveData<ProductDataSource.SortOrder> _sortOrder = new MutableLiveData<>(ProductDataSource.SortOrder.DEFAULT);
+    private final MutableLiveData<String> _searchQuery = new MutableLiveData<>();
+    public final LiveData<List<Product>> products = _products;
 
-    public HomeViewModel() {
-        mTexts = new MutableLiveData<>();
-
+    public HomeViewModel(@NonNull Application application) {
+        super(application);
+        dataSource = new ProductDataSource(application.getApplicationContext());
+        dataSource.open();
+        loadProducts();
     }
 
-    public LiveData<List<String>> getTexts() {
-        return mTexts;
+    public void setSortOrder(ProductDataSource.SortOrder sortOrder) {
+        _sortOrder.setValue(sortOrder);
+        loadProducts(); // Przeładuj dane po zmianie sortowania
+    }
+
+    public void setSearchQuery(String query) {
+        _searchQuery.setValue(query);
+        loadProducts();
+    }
+
+    private void loadProducts() {
+        List<Product> productList = dataSource.getAllProducts(_sortOrder.getValue(), _searchQuery.getValue());
+        _products.postValue(productList);
+    }
+
+    @Override
+    protected void onCleared() {
+        super.onCleared();
+        dataSource.close();
     }
 }
