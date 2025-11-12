@@ -1,5 +1,6 @@
 package com.example.qfoodly.ui.home;
 
+import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.text.Editable;
@@ -37,6 +38,8 @@ public class HomeFragment extends Fragment {
     private boolean isGridView = false;
     private ProductDataSource.SortOrder currentSortOrder = ProductDataSource.SortOrder.DEFAULT;
     private ProductDataSource dataSource;
+    private SharedPreferences sharedPreferences;
+    private static final String PREF_VIEW_MODE = "view_mode_grid";
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentHomeBinding.inflate(inflater, container, false);
@@ -50,6 +53,9 @@ public class HomeFragment extends Fragment {
         HomeViewModelFactory factory = new HomeViewModelFactory(requireActivity().getApplication());
         homeViewModel = new ViewModelProvider(this, factory).get(HomeViewModel.class);
         dataSource = new ProductDataSource(requireContext());
+        sharedPreferences = requireContext().getSharedPreferences("home_prefs", android.content.Context.MODE_PRIVATE);
+
+        isGridView = loadViewMode();
 
         adapter = new ProductAdapter(
                 product -> {
@@ -59,7 +65,6 @@ public class HomeFragment extends Fragment {
                             .navigate(R.id.action_nav_home_to_productDetailFragment, bundle);
                 },
                 product -> {
-                    // Checkbox changed callback
                     dataSource.open();
                     dataSource.markAsUsed(product.getId(), product.isUsed());
                     dataSource.close();
@@ -93,7 +98,10 @@ public class HomeFragment extends Fragment {
     }
 
     private void setupRecyclerView() {
-        binding.recyclerviewHome.setLayoutManager(new LinearLayoutManager(getContext()));
+        adapter.setViewType(isGridView ? ProductAdapter.VIEW_TYPE_GRID : ProductAdapter.VIEW_TYPE_LIST);
+        binding.recyclerviewHome.setLayoutManager(
+                isGridView ? new GridLayoutManager(getContext(), 2) : new LinearLayoutManager(getContext())
+        );
         binding.recyclerviewHome.setAdapter(adapter);
 
         RecyclerView.ItemAnimator animator = binding.recyclerviewHome.getItemAnimator();
@@ -114,12 +122,19 @@ public class HomeFragment extends Fragment {
             @Override
             public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
                 menuInflater.inflate(R.menu.home_menu, menu);
+                MenuItem switchLayoutItem = menu.findItem(R.id.action_switch_layout);
+                if (switchLayoutItem != null) {
+                    switchLayoutItem.setIcon(isGridView ? R.drawable.ic_listview_black_24dp : R.drawable.ic_gridview_black_24dp);
+                }
             }
 
             @Override
             public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
                 if (menuItem.getItemId() == R.id.action_switch_layout) {
                     isGridView = !isGridView;
+                    
+                    // Zapisz nowy stan
+                    saveViewMode(isGridView);
 
                     adapter.setViewType(isGridView ? ProductAdapter.VIEW_TYPE_GRID : ProductAdapter.VIEW_TYPE_LIST);
                     binding.recyclerviewHome.setLayoutManager(
@@ -188,6 +203,14 @@ public class HomeFragment extends Fragment {
             button.setStrokeWidth(1);
             button.setTextColor(grayColor);
         }
+    }
+
+    private void saveViewMode(boolean isGridView) {
+        sharedPreferences.edit().putBoolean(PREF_VIEW_MODE, isGridView).apply();
+    }
+
+    private boolean loadViewMode() {
+        return sharedPreferences.getBoolean(PREF_VIEW_MODE, false);
     }
 
     @Override
