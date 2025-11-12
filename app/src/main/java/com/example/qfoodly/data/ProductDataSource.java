@@ -19,6 +19,12 @@ public class ProductDataSource {
         NAME_DESC
     }
 
+    public enum StatusFilter {
+        ALL,
+        ACTIVE,
+        USED
+    }
+
     private SQLiteDatabase database;
     private ProductDbHelper dbHelper;
     private String[] columns = {
@@ -29,7 +35,8 @@ public class ProductDataSource {
             ProductDbHelper.COLUMN_CATEGORY,
             ProductDbHelper.COLUMN_DESCRIPTION,
             ProductDbHelper.COLUMN_STORE,
-            ProductDbHelper.COLUMN_PURCHASE_DATE
+            ProductDbHelper.COLUMN_PURCHASE_DATE,
+            ProductDbHelper.COLUMN_IS_USED
     };
 
     public ProductDataSource(Context context) {
@@ -58,6 +65,10 @@ public class ProductDataSource {
     }
 
     public List<Product> getAllProducts(SortOrder sortOrder, String query) {
+        return getProductsByStatus(sortOrder, query, StatusFilter.ALL);
+    }
+
+    public List<Product> getProductsByStatus(SortOrder sortOrder, String query, StatusFilter statusFilter) {
         List<Product> products = new ArrayList<>();
         String orderBy;
 
@@ -82,9 +93,22 @@ public class ProductDataSource {
 
         String selection = null;
         String[] selectionArgs = null;
+
+        if (statusFilter == StatusFilter.ACTIVE) {
+            selection = ProductDbHelper.COLUMN_IS_USED + " = 0";
+        } else if (statusFilter == StatusFilter.USED) {
+            selection = ProductDbHelper.COLUMN_IS_USED + " = 1";
+        }
+
         if (query != null && !query.isEmpty()) {
-            selection = ProductDbHelper.COLUMN_NAME + " LIKE ?";
-            selectionArgs = new String[]{"%" + query + "%"};
+            String querySelection = ProductDbHelper.COLUMN_NAME + " LIKE ?";
+            if (selection != null) {
+                selection = selection + " AND " + querySelection;
+                selectionArgs = new String[]{"%" + query + "%"};
+            } else {
+                selection = querySelection;
+                selectionArgs = new String[]{"%" + query + "%"};
+            }
         }
 
         Cursor cursor = database.query(ProductDbHelper.TABLE_PRODUCTS, columns, selection, selectionArgs, null, null, orderBy);
@@ -98,7 +122,33 @@ public class ProductDataSource {
 
         cursor.close();
         return products;
-        }
+    }
+
+    public void updateProduct(long id, String name, double price, String expirationDate, String category, String description, String store, String purchaseDate) {
+        ContentValues values = new ContentValues();
+        values.put(ProductDbHelper.COLUMN_NAME, name);
+        values.put(ProductDbHelper.COLUMN_PRICE, price);
+        values.put(ProductDbHelper.COLUMN_EXPIRATION_DATE, expirationDate);
+        values.put(ProductDbHelper.COLUMN_CATEGORY, category);
+        values.put(ProductDbHelper.COLUMN_DESCRIPTION, description);
+        values.put(ProductDbHelper.COLUMN_STORE, store);
+        values.put(ProductDbHelper.COLUMN_PURCHASE_DATE, purchaseDate);
+
+        database.update(ProductDbHelper.TABLE_PRODUCTS, values,
+                ProductDbHelper.COLUMN_ID + " = " + id, null);
+    }
+
+    public void deleteProduct(long id) {
+        database.delete(ProductDbHelper.TABLE_PRODUCTS,
+                ProductDbHelper.COLUMN_ID + " = " + id, null);
+    }
+
+    public void markAsUsed(long id, boolean isUsed) {
+        ContentValues values = new ContentValues();
+        values.put(ProductDbHelper.COLUMN_IS_USED, isUsed ? 1 : 0);
+        database.update(ProductDbHelper.TABLE_PRODUCTS, values,
+                ProductDbHelper.COLUMN_ID + " = " + id, null);
+    }
 
     private Product cursorToProduct(Cursor cursor) {
         long id = cursor.getLong(0);
@@ -109,7 +159,8 @@ public class ProductDataSource {
         String description = cursor.getString(5);
         String store = cursor.getString(6);
         String purchaseDate = cursor.getString(7);
+        boolean isUsed = cursor.getInt(8) != 0;
 
-        return new Product(id, name, price, expirationDate, category, description, store, purchaseDate);
+        return new Product(id, name, price, expirationDate, category, description, store, purchaseDate, isUsed);
     }
 }

@@ -1,6 +1,7 @@
 package com.example.qfoodly.ui.addproduct;
 
 import android.app.DatePickerDialog;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -13,6 +14,7 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.qfoodly.R;
+import com.example.qfoodly.data.Product;
 import com.example.qfoodly.data.ProductDataSource;
 import com.example.qfoodly.databinding.FragmentAddProductBinding;
 
@@ -25,6 +27,8 @@ public class AddProductFragment extends Fragment {
 
     private FragmentAddProductBinding binding;
     private ProductDataSource dataSource;
+    private Product editingProduct = null;
+    private boolean isEditMode = false;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -34,10 +38,30 @@ public class AddProductFragment extends Fragment {
 
         dataSource = new ProductDataSource(getContext());
 
+        if (getArguments() != null) {
+            editingProduct = getArguments().getParcelable("product");
+            isEditMode = getArguments().getBoolean("isEdit", false);
+            
+            if (editingProduct != null && isEditMode) {
+                populateFormWithProduct(editingProduct);
+                binding.saveButton.setText("Update");
+            }
+        }
+
         setupDatePickers();
         binding.saveButton.setOnClickListener(v -> saveProduct());
 
         return root;
+    }
+
+    private void populateFormWithProduct(Product product) {
+        binding.productNameEditText.setText(product.getName());
+        binding.priceEditText.setText(String.valueOf(product.getPrice()));
+        binding.expirationDateEditText.setText(product.getExpirationDate());
+        binding.categoryEditText.setText(product.getCategory());
+        binding.descriptionEditText.setText(product.getDescription());
+        binding.storeEditText.setText(product.getStore());
+        binding.purchaseDateEditText.setText(product.getPurchaseDate());
     }
 
     private void setupDatePickers() {
@@ -159,14 +183,22 @@ public class AddProductFragment extends Fragment {
         }
 
         double price = Double.parseDouble(priceStr);
-        long productId = dataSource.createProduct(name, price, expirationDate, category, description, store, purchaseDate);
 
-        if (productId != -1) {
-            Toast.makeText(getContext(), "Product saved successfully!", Toast.LENGTH_SHORT).show();
-            NavHostFragment.findNavController(this).navigate(R.id.action_nav_add_product_to_nav_home);
+        if (isEditMode && editingProduct != null) {
+            dataSource.updateProduct(editingProduct.getId(), name, price, expirationDate, category, description, store, purchaseDate);
+            Toast.makeText(getContext(), "Product updated successfully!", Toast.LENGTH_SHORT).show();
         } else {
-            Toast.makeText(getContext(), "Error saving product", Toast.LENGTH_SHORT).show();
+            long productId = dataSource.createProduct(name, price, expirationDate, category, description, store, purchaseDate);
+            if (productId != -1) {
+                Toast.makeText(getContext(), "Product saved successfully!", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(getContext(), "Error saving product", Toast.LENGTH_SHORT).show();
+                return;
+            }
         }
+
+        playConfirmationSound();
+        NavHostFragment.findNavController(this).navigate(R.id.action_nav_add_product_to_nav_home);
     }
 
     private boolean isValidExpirationDate(String dateStr) {
@@ -192,6 +224,18 @@ public class AddProductFragment extends Fragment {
             return calExpiration.getTimeInMillis() >= calToday.getTimeInMillis();
         } catch (Exception e) {
             return false;
+        }
+    }
+
+    private void playConfirmationSound() {
+        try {
+            MediaPlayer mediaPlayer = MediaPlayer.create(getContext(), R.raw.confirm_sound);
+            if (mediaPlayer != null) {
+                mediaPlayer.setOnCompletionListener(MediaPlayer::release);
+                mediaPlayer.start();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

@@ -12,8 +12,13 @@ public class Product implements Parcelable {
     private String description;
     private String store;
     private String purchaseDate;
+    private boolean isUsed;
 
     public Product(long id, String name, double price, String expirationDate, String category, String description, String store, String purchaseDate) {
+        this(id, name, price, expirationDate, category, description, store, purchaseDate, false);
+    }
+
+    public Product(long id, String name, double price, String expirationDate, String category, String description, String store, String purchaseDate, boolean isUsed) {
         this.id = id;
         this.name = name;
         this.price = price;
@@ -22,6 +27,7 @@ public class Product implements Parcelable {
         this.description = description;
         this.store = store;
         this.purchaseDate = purchaseDate;
+        this.isUsed = isUsed;
     }
 
     protected Product(Parcel in) {
@@ -33,6 +39,7 @@ public class Product implements Parcelable {
         description = in.readString();
         store = in.readString();
         purchaseDate = in.readString();
+        isUsed = in.readByte() != 0;
     }
 
     @Override
@@ -45,6 +52,7 @@ public class Product implements Parcelable {
         dest.writeString(description);
         dest.writeString(store);
         dest.writeString(purchaseDate);
+        dest.writeByte((byte) (isUsed ? 1 : 0));
     }
 
     @Override
@@ -126,5 +134,13 @@ public class Product implements Parcelable {
 
     public void setPurchaseDate(String purchaseDate) {
         this.purchaseDate = purchaseDate;
+    }
+
+    public boolean isUsed() {
+        return isUsed;
+    }
+
+    public void setUsed(boolean used) {
+        isUsed = used;
     }
 }

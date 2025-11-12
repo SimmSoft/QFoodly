@@ -37,6 +37,9 @@
             android:name="product"
             app:argType="com.example.qfoodly.data.Product" />
 
+        <action
+            android:id="@+id/action_productDetailFragment_to_nav_add_product"
+            app:destination="@id/nav_add_product" />
     </fragment>
 
 
@@ -96,5 +99,14 @@
         <action
             android:id="@+id/action_nav_add_product_to_nav_home"
             app:destination="@id/nav_home" />
+        
+        <argument
+            android:name="product"
+            app:argType="com.example.qfoodly.data.Product"
+            android:defaultValue="@null" />
+        <argument
+            android:name="isEdit"
+            app:argType="boolean"
+            android:defaultValue="false" />
     </fragment>
 </navigation>

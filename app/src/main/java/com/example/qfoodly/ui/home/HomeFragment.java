@@ -1,5 +1,6 @@
 package com.example.qfoodly.ui.home;
 
+import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -24,6 +25,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.qfoodly.R;
+import com.example.qfoodly.data.Product;
 import com.example.qfoodly.data.ProductDataSource;
 import com.example.qfoodly.databinding.FragmentHomeBinding;
 
@@ -34,6 +36,7 @@ public class HomeFragment extends Fragment {
     private ProductAdapter adapter;
     private boolean isGridView = false;
     private ProductDataSource.SortOrder currentSortOrder = ProductDataSource.SortOrder.DEFAULT;
+    private ProductDataSource dataSource;
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentHomeBinding.inflate(inflater, container, false);
@@ -46,19 +49,29 @@ public class HomeFragment extends Fragment {
 
         HomeViewModelFactory factory = new HomeViewModelFactory(requireActivity().getApplication());
         homeViewModel = new ViewModelProvider(this, factory).get(HomeViewModel.class);
+        dataSource = new ProductDataSource(requireContext());
 
-        adapter = new ProductAdapter(product -> {
-            Bundle bundle = new Bundle();
-            bundle.putParcelable("product", product);
-            NavHostFragment.findNavController(HomeFragment.this)
-                    .navigate(R.id.action_nav_home_to_productDetailFragment, bundle);
-        });
+        adapter = new ProductAdapter(
+                product -> {
+                    Bundle bundle = new Bundle();
+                    bundle.putParcelable("product", product);
+                    NavHostFragment.findNavController(HomeFragment.this)
+                            .navigate(R.id.action_nav_home_to_productDetailFragment, bundle);
+                },
+                product -> {
+                    // Checkbox changed callback
+                    dataSource.open();
+                    dataSource.markAsUsed(product.getId(), product.isUsed());
+                    dataSource.close();
+                }
+        );
 
         setupRecyclerView();
         setupFab();
         setupMenu();
         setupSortButton();
         setupSearch();
+        setupFilterButtons();
 
         homeViewModel.products.observe(getViewLifecycleOwner(), products -> {
             adapter.submitList(products);
@@ -135,6 +148,46 @@ public class HomeFragment extends Fragment {
             }
             homeViewModel.setSortOrder(currentSortOrder);
         });
+    }
+
+    private void setupFilterButtons() {
+        binding.btnFilterAll.setOnClickListener(v -> {
+            homeViewModel.setStatusFilter(ProductDataSource.StatusFilter.ALL);
+            updateFilterButtonStates(ProductDataSource.StatusFilter.ALL);
+        });
+
+        binding.btnFilterActive.setOnClickListener(v -> {
+            homeViewModel.setStatusFilter(ProductDataSource.StatusFilter.ACTIVE);
+            updateFilterButtonStates(ProductDataSource.StatusFilter.ACTIVE);
+        });
+
+        binding.btnFilterUsed.setOnClickListener(v -> {
+            homeViewModel.setStatusFilter(ProductDataSource.StatusFilter.USED);
+            updateFilterButtonStates(ProductDataSource.StatusFilter.USED);
+        });
+
+        updateFilterButtonStates(ProductDataSource.StatusFilter.ALL);
+    }
+
+    private void updateFilterButtonStates(ProductDataSource.StatusFilter activeFilter) {
+        int primaryColor = getContext().getColor(R.color.primary_light);
+        int grayColor = getContext().getColor(android.R.color.darker_gray);
+        
+        updateButtonStyle(binding.btnFilterAll, activeFilter == ProductDataSource.StatusFilter.ALL, primaryColor, grayColor);
+        updateButtonStyle(binding.btnFilterActive, activeFilter == ProductDataSource.StatusFilter.ACTIVE, primaryColor, grayColor);
+        updateButtonStyle(binding.btnFilterUsed, activeFilter == ProductDataSource.StatusFilter.USED, primaryColor, grayColor);
+    }
+    
+    private void updateButtonStyle(com.google.android.material.button.MaterialButton button, boolean isActive, int primaryColor, int grayColor) {
+        if (isActive) {
+            button.setStrokeColor(ColorStateList.valueOf(primaryColor));
+            button.setStrokeWidth(3);
+            button.setTextColor(primaryColor);
+        } else {
+            button.setStrokeColor(ColorStateList.valueOf(grayColor));
+            button.setStrokeWidth(1);
+            button.setTextColor(grayColor);
+        }
     }
 
     @Override

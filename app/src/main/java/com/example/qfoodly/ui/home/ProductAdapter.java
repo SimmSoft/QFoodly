@@ -27,8 +27,13 @@ public class ProductAdapter extends ListAdapter<Product, RecyclerView.ViewHolder
 
     private int currentViewType = VIEW_TYPE_LIST;
     private final Consumer<Product> onProductClicked;
+    private final Consumer<Product> onProductUsedChanged;
 
     public ProductAdapter(Consumer<Product> onProductClicked) {
+        this(onProductClicked, null);
+    }
+
+    public ProductAdapter(Consumer<Product> onProductClicked, Consumer<Product> onProductUsedChanged) {
         super(new DiffUtil.ItemCallback<Product>() {
             @Override
             public boolean areItemsTheSame(@NonNull Product oldItem, @NonNull Product newItem) {
@@ -39,10 +44,12 @@ public class ProductAdapter extends ListAdapter<Product, RecyclerView.ViewHolder
                 return oldItem.getName().equals(newItem.getName()) &&
                         oldItem.getPrice() == newItem.getPrice() &&
                         oldItem.getCategory().equals(newItem.getCategory()) &&
-                        oldItem.getExpirationDate().equals(newItem.getExpirationDate());
+                        oldItem.getExpirationDate().equals(newItem.getExpirationDate()) &&
+                        oldItem.isUsed() == newItem.isUsed();
             }
         });
         this.onProductClicked = onProductClicked;
+        this.onProductUsedChanged = onProductUsedChanged;
     }
 
     public void setViewType(int viewType) {
@@ -79,9 +86,9 @@ public class ProductAdapter extends ListAdapter<Product, RecyclerView.ViewHolder
         });
 
         if (holder instanceof ListViewHolder) {
-            ((ListViewHolder) holder).bind(product);
+            ((ListViewHolder) holder).bind(product, onProductUsedChanged);
         } else if (holder instanceof GridViewHolder) {
-            ((GridViewHolder) holder).bind(product);
+            ((GridViewHolder) holder).bind(product, onProductUsedChanged);
         }
     }
 
@@ -94,7 +101,7 @@ public class ProductAdapter extends ListAdapter<Product, RecyclerView.ViewHolder
 
         protected boolean isProductExpired(Product product) {
             try {
-                SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
                 Date expirationDate = sdf.parse(product.getExpirationDate());
                 return expirationDate != null && expirationDate.before(new java.util.Date());
             } catch (ParseException e) {
@@ -114,16 +121,38 @@ public class ProductAdapter extends ListAdapter<Product, RecyclerView.ViewHolder
 
         @Override
         void bind(Product product) {
+            bind(product, null);
+        }
+
+        void bind(Product product, Consumer<Product> onUsedChanged) {
             binding.productNameText.setText(product.getName());
             binding.productPriceText.setText(String.format(Locale.getDefault(), "%.2f zł", product.getPrice()));
             binding.productCategoryText.setText(product.getCategory());
             binding.productExpirationDateText.setText(product.getExpirationDate());
 
-            if(isProductExpired(product)) {
-                binding.getRoot().setCardBackgroundColor(itemView.getContext().getColor(R.color.card_background_expired));
+            binding.productUsedCheckbox.setOnCheckedChangeListener(null);
+            binding.productUsedCheckbox.setChecked(product.isUsed());
+            binding.productUsedCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                product.setUsed(isChecked);
+                if (onUsedChanged != null) {
+                    onUsedChanged.accept(product);
+                }
+                updateCardColor(product);
+            });
+
+            updateCardColor(product);
+        }
+
+        private void updateCardColor(Product product) {
+            int backgroundColor;
+            if (product.isUsed()) {
+                backgroundColor = R.color.card_background_used;
+            } else if (isProductExpired(product)) {
+                backgroundColor = R.color.card_background_expired;
             } else {
-                binding.getRoot().setCardBackgroundColor(itemView.getContext().getColor(R.color.card_background_dark));
+                backgroundColor = R.color.card_background_dark;
             }
+            binding.getRoot().setCardBackgroundColor(itemView.getContext().getColor(backgroundColor));
         }
     }
 
@@ -137,15 +166,37 @@ public class ProductAdapter extends ListAdapter<Product, RecyclerView.ViewHolder
 
         @Override
         void bind(Product product) {
+            bind(product, null);
+        }
+
+        void bind(Product product, Consumer<Product> onUsedChanged) {
             binding.productNameText.setText(product.getName());
             binding.productPriceText.setText(String.format(Locale.getDefault(), "%.2f zł", product.getPrice()));
             binding.productExpirationDateText.setText("Expires: " + product.getExpirationDate());
 
-            if(isProductExpired(product)) {
-                binding.getRoot().setCardBackgroundColor(itemView.getContext().getColor(R.color.card_background_expired));
+            binding.productUsedCheckbox.setOnCheckedChangeListener(null);
+            binding.productUsedCheckbox.setChecked(product.isUsed());
+            binding.productUsedCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                product.setUsed(isChecked);
+                if (onUsedChanged != null) {
+                    onUsedChanged.accept(product);
+                }
+                updateCardColor(product);
+            });
+
+            updateCardColor(product);
+        }
+
+        private void updateCardColor(Product product) {
+            int backgroundColor;
+            if (product.isUsed()) {
+                backgroundColor = R.color.card_background_used;
+            } else if (isProductExpired(product)) {
+                backgroundColor = R.color.card_background_expired;
             } else {
-                binding.getRoot().setCardBackgroundColor(itemView.getContext().getColor(R.color.card_background_dark));
+                backgroundColor = R.color.card_background_dark;
             }
+            binding.getRoot().setCardBackgroundColor(itemView.getContext().getColor(backgroundColor));
         }
     }
 }

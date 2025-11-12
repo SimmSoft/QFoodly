@@ -12,4 +12,5 @@
     <color name="secondary_dark">#1d1d1d</color>
     <color name="card_background_dark">#303030</color>
     <color name="card_background_expired">#CC4040</color>
+    <color name="card_background_used">#5A5A5A</color>
 </resources>

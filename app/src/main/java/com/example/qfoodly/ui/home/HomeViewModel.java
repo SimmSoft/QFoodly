@@ -18,6 +18,7 @@ public class HomeViewModel extends AndroidViewModel {
     private final MutableLiveData<List<Product>> _products = new MutableLiveData<>();
     private final MutableLiveData<ProductDataSource.SortOrder> _sortOrder = new MutableLiveData<>(ProductDataSource.SortOrder.DEFAULT);
     private final MutableLiveData<String> _searchQuery = new MutableLiveData<>();
+    private final MutableLiveData<ProductDataSource.StatusFilter> _statusFilter = new MutableLiveData<>(ProductDataSource.StatusFilter.ALL);
     public final LiveData<List<Product>> products = _products;
 
     public HomeViewModel(@NonNull Application application) {
@@ -29,7 +30,7 @@ public class HomeViewModel extends AndroidViewModel {
 
     public void setSortOrder(ProductDataSource.SortOrder sortOrder) {
         _sortOrder.setValue(sortOrder);
-        loadProducts(); // Przeładuj dane po zmianie sortowania
+        loadProducts();
     }
 
     public void setSearchQuery(String query) {
@@ -37,8 +38,17 @@ public class HomeViewModel extends AndroidViewModel {
         loadProducts();
     }
 
+    public void setStatusFilter(ProductDataSource.StatusFilter statusFilter) {
+        _statusFilter.setValue(statusFilter);
+        loadProducts();
+    }
+
     private void loadProducts() {
-        List<Product> productList = dataSource.getAllProducts(_sortOrder.getValue(), _searchQuery.getValue());
+        List<Product> productList = dataSource.getProductsByStatus(
+                _sortOrder.getValue(),
+                _searchQuery.getValue(),
+                _statusFilter.getValue()
+        );
         _products.postValue(productList);
     }
 
