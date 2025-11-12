@@ -1,5 +1,6 @@
 package com.example.qfoodly.ui.addproduct;
 
+import android.app.DatePickerDialog;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -15,6 +16,11 @@ import com.example.qfoodly.R;
 import com.example.qfoodly.data.ProductDataSource;
 import com.example.qfoodly.databinding.FragmentAddProductBinding;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
+
 public class AddProductFragment extends Fragment {
 
     private FragmentAddProductBinding binding;
@@ -28,9 +34,62 @@ public class AddProductFragment extends Fragment {
 
         dataSource = new ProductDataSource(getContext());
 
+        setupDatePickers();
         binding.saveButton.setOnClickListener(v -> saveProduct());
 
         return root;
+    }
+
+    private void setupDatePickers() {
+        binding.expirationDateLayout.setEndIconOnClickListener(v -> 
+            showDatePicker(binding.expirationDateEditText));
+
+        binding.purchaseDateLayout.setEndIconOnClickListener(v -> 
+            showDatePicker(binding.purchaseDateEditText));
+
+        binding.expirationDateEditText.setOnClickListener(v -> 
+            showDatePicker(binding.expirationDateEditText));
+
+        binding.purchaseDateEditText.setOnClickListener(v -> 
+            showDatePicker(binding.purchaseDateEditText));
+    }
+
+    private void showDatePicker(View dateEditText) {
+        Calendar calendar = Calendar.getInstance();
+        String currentText = binding.expirationDateEditText.getText().toString();
+        
+        if (dateEditText == binding.purchaseDateEditText) {
+            currentText = binding.purchaseDateEditText.getText().toString();
+        }
+
+        if (!currentText.isEmpty()) {
+            try {
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                Date date = sdf.parse(currentText);
+                calendar.setTime(date);
+            } catch (Exception e) {
+                // Use current date if parsing fails
+            }
+        }
+
+        DatePickerDialog datePickerDialog = new DatePickerDialog(
+                requireContext(),
+                (view, year, month, dayOfMonth) -> {
+                    String selectedDate = String.format(Locale.getDefault(), "%04d-%02d-%02d", 
+                            year, month + 1, dayOfMonth);
+                    if (dateEditText == binding.expirationDateEditText) {
+                        binding.expirationDateEditText.setText(selectedDate);
+                        binding.expirationDateLayout.setError(null);
+                    } else {
+                        binding.purchaseDateEditText.setText(selectedDate);
+                        binding.purchaseDateLayout.setError(null);
+                    }
+                },
+                calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.DAY_OF_MONTH));
+
+        datePickerDialog.show();
     }
 
     @Override
@@ -46,6 +105,8 @@ public class AddProductFragment extends Fragment {
     }
 
     private void saveProduct() {
+        clearErrors();
+
         String name = binding.productNameEditText.getText().toString().trim();
         String priceStr = binding.priceEditText.getText().toString().trim();
         String expirationDate = binding.expirationDateEditText.getText().toString().trim();
@@ -54,19 +115,50 @@ public class AddProductFragment extends Fragment {
         String store = binding.storeEditText.getText().toString().trim();
         String purchaseDate = binding.purchaseDateEditText.getText().toString().trim();
 
-        if (TextUtils.isEmpty(name) || TextUtils.isEmpty(priceStr) || TextUtils.isEmpty(expirationDate) || TextUtils.isEmpty(category)) {
-            Toast.makeText(getContext(), "Please fill in all required fields", Toast.LENGTH_SHORT).show();
+        boolean isValid = true;
+
+        if (TextUtils.isEmpty(name)) {
+            binding.productNameLayout.setError("Product name is required");
+            isValid = false;
+        }
+
+        if (TextUtils.isEmpty(priceStr)) {
+            binding.priceLayout.setError("Price is required");
+            isValid = false;
+        } else {
+            try {
+                double price = Double.parseDouble(priceStr);
+                if (price <= 0) {
+                    binding.priceLayout.setError("Price must be greater than 0");
+                    isValid = false;
+                }
+            } catch (NumberFormatException e) {
+                binding.priceLayout.setError("Invalid price format");
+                isValid = false;
+            }
+        }
+
+        if (TextUtils.isEmpty(expirationDate)) {
+            binding.expirationDateLayout.setError("Expiration date is required");
+            isValid = false;
+        } else {
+            if (!isValidExpirationDate(expirationDate)) {
+                binding.expirationDateLayout.setError("Expiration date cannot be earlier than today");
+                isValid = false;
+            }
+        }
+
+        if (TextUtils.isEmpty(category)) {
+            binding.categoryLayout.setError("Category is required");
+            isValid = false;
+        }
+
+        if (!isValid) {
+            Toast.makeText(getContext(), "Please correct the errors", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        double price = 0;
-        try {
-            price = Double.parseDouble(priceStr);
-        } catch (NumberFormatException e) {
-            Toast.makeText(getContext(), "Invalid price format", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
+        double price = Double.parseDouble(priceStr);
         long productId = dataSource.createProduct(name, price, expirationDate, category, description, store, purchaseDate);
 
         if (productId != -1) {
@@ -75,6 +167,39 @@ public class AddProductFragment extends Fragment {
         } else {
             Toast.makeText(getContext(), "Error saving product", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private boolean isValidExpirationDate(String dateStr) {
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+            Date expirationDate = sdf.parse(dateStr);
+            Date today = new Date();
+            
+            Calendar calToday = Calendar.getInstance();
+            calToday.setTime(today);
+            calToday.set(Calendar.HOUR_OF_DAY, 0);
+            calToday.set(Calendar.MINUTE, 0);
+            calToday.set(Calendar.SECOND, 0);
+            calToday.set(Calendar.MILLISECOND, 0);
+
+            Calendar calExpiration = Calendar.getInstance();
+            calExpiration.setTime(expirationDate);
+            calExpiration.set(Calendar.HOUR_OF_DAY, 0);
+            calExpiration.set(Calendar.MINUTE, 0);
+            calExpiration.set(Calendar.SECOND, 0);
+            calExpiration.set(Calendar.MILLISECOND, 0);
+
+            return calExpiration.getTimeInMillis() >= calToday.getTimeInMillis();
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    private void clearErrors() {
+        binding.productNameLayout.setError(null);
+        binding.priceLayout.setError(null);
+        binding.expirationDateLayout.setError(null);
+        binding.categoryLayout.setError(null);
     }
 
     @Override
