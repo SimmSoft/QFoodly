@@ -9,152 +9,223 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp">
+        android:padding="20dp">
 
         <!-- Product Name -->
         <TextView
             android:id="@+id/product_name_label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="370dp"
+            android:layout_height="19dp"
+            android:layout_marginEnd="21dp"
+            android:letterSpacing="0.05"
             android:text="Product name"
+            android:textAlignment="center"
             android:textColor="@color/white"
-            android:textSize="10pt"
+            android:textSize="11sp"
             android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"/>
+            app:layout_constraintTop_toTopOf="parent" />
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/product_name_layout"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            app:layout_constraintTop_toBottomOf="@id/product_name_label"
-            app:layout_constraintStart_toStartOf="parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="6dp"
+            app:errorEnabled="true"
             app:layout_constraintEnd_toEndOf="parent"
-            app:errorEnabled="true">
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/product_name_label">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/product_name_edit_text"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Enter the name of the product"/>
+                android:layout_height="56dp"
+                android:hint="Enter the name of the product"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp"
+                android:textSize="13sp" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Product Price -->
+        <!-- Product Price & Category Row -->
         <TextView
             android:id="@+id/product_price_label"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="Price"
             android:textColor="@color/white"
-            android:textSize="10pt"
+            android:textSize="11sp"
             android:textStyle="bold"
-            android:layout_marginTop="16dp"
+            android:letterSpacing="0.05"
+            android:layout_marginTop="18dp"
+            android:gravity="center"
+            app:layout_constraintEnd_toStartOf="@id/product_category_label"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/product_name_layout"/>
+
+        <TextView
+            android:id="@+id/product_category_label"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Category"
+            android:textColor="@color/white"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.05"
+            android:layout_marginTop="18dp"
+            android:gravity="center"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/product_price_label"
             app:layout_constraintTop_toBottomOf="@id/product_name_layout"/>
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/price_layout"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            app:layout_constraintTop_toBottomOf="@id/product_price_label"
+            android:layout_height="56dp"
+            android:layout_marginTop="6dp"
+            android:layout_marginEnd="6dp"
+            app:errorEnabled="true"
+            app:layout_constraintEnd_toStartOf="@id/category_layout"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:errorEnabled="true">
+            app:layout_constraintTop_toBottomOf="@id/product_price_label">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/price_edit_text"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="56dp"
+                android:hint="Price"
                 android:inputType="numberDecimal"
-                android:hint="Input the price of the product"/>
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp"
+                android:textSize="13sp" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Product Expiration Date -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/category_layout"
+            android:layout_width="0dp"
+            android:layout_height="56dp"
+            android:layout_marginTop="6dp"
+            android:layout_marginStart="6dp"
+            app:errorEnabled="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/price_layout"
+            app:layout_constraintTop_toBottomOf="@id/product_category_label">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/category_edit_text"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:hint="Category"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp"
+                android:textSize="13sp" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Product Expiration Date & Purchase Date Row -->
         <TextView
             android:id="@+id/product_expiration_date_label"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:letterSpacing="0.05"
             android:text="Expiration date"
             android:textColor="@color/white"
-            android:textSize="10pt"
+            android:textSize="11sp"
             android:textStyle="bold"
-            android:layout_marginTop="16dp"
+            android:gravity="center"
+            app:layout_constraintEnd_toStartOf="@id/product_purchase_date_label"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/price_layout" />
+
+        <TextView
+            android:id="@+id/product_purchase_date_label"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Purchase date"
+            android:textColor="@color/white"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.05"
+            android:layout_marginTop="18dp"
+            android:gravity="center"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/product_expiration_date_label"
             app:layout_constraintTop_toBottomOf="@id/price_layout"/>
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/expiration_date_layout"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            app:layout_constraintTop_toBottomOf="@id/product_expiration_date_label"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:errorEnabled="true"
+            android:layout_height="56dp"
+            android:layout_marginTop="6dp"
+            android:layout_marginEnd="6dp"
+            app:endIconDrawable="@drawable/ic_calendar"
             app:endIconMode="custom"
-            app:endIconDrawable="@drawable/ic_calendar">
+            app:errorEnabled="true"
+            app:layout_constraintEnd_toStartOf="@id/purchase_date_layout"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/product_expiration_date_label">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/expiration_date_edit_text"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="date"
-                android:hint="Input the expiration date of the product"
+                android:layout_height="56dp"
+                android:clickable="true"
                 android:focusable="false"
-                android:clickable="true"/>
+                android:hint="Exp. date"
+                android:inputType="date"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp"
+                android:textSize="13sp" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Product Category -->
-        <TextView
-            android:id="@+id/product_category_label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Category"
-            android:textColor="@color/white"
-            android:textSize="10pt"
-            android:textStyle="bold"
-            android:layout_marginTop="16dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/expiration_date_layout"/>
-
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/category_layout"
+            android:id="@+id/purchase_date_layout"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            app:layout_constraintTop_toBottomOf="@id/product_category_label"
-            app:layout_constraintStart_toStartOf="parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="6dp"
+            android:layout_marginStart="6dp"
+            app:endIconDrawable="@drawable/ic_calendar"
+            app:endIconMode="custom"
+            app:errorEnabled="true"
             app:layout_constraintEnd_toEndOf="parent"
-            app:errorEnabled="true">
+            app:layout_constraintStart_toEndOf="@id/expiration_date_layout"
+            app:layout_constraintTop_toBottomOf="@id/product_purchase_date_label">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/category_edit_text"
+                android:id="@+id/purchase_date_edit_text"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Input the category of the product"/>
+                android:layout_height="56dp"
+                android:clickable="true"
+                android:focusable="false"
+                android:hint="Purchase date"
+                android:inputType="date"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp"
+                android:textSize="13sp" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <!-- Product Description -->
         <TextView
             android:id="@+id/product_description_label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="369dp"
+            android:layout_height="17dp"
+            android:layout_marginTop="18dp"
+            android:letterSpacing="0.05"
             android:text="Description"
+            android:textAlignment="center"
             android:textColor="@color/white"
-            android:textSize="10pt"
+            android:textSize="11sp"
             android:textStyle="bold"
-            android:layout_marginTop="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/category_layout"/>
+            app:layout_constraintTop_toBottomOf="@id/purchase_date_layout" />
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/description_layout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="6dp"
             app:layout_constraintTop_toBottomOf="@id/product_description_label"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
@@ -162,30 +233,36 @@
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/description_edit_text"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="80dp"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp"
+                android:paddingTop="10dp"
+                android:textSize="13sp"
                 android:gravity="top"
-                android:lines="3"
                 android:hint="Input the description of the product"/>
         </com.google.android.material.textfield.TextInputLayout>
 
         <!-- Product Store -->
         <TextView
             android:id="@+id/product_store_label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="369dp"
+            android:layout_height="21dp"
+            android:layout_marginTop="18dp"
+            android:letterSpacing="0.05"
             android:text="Store"
+            android:textAlignment="center"
             android:textColor="@color/white"
-            android:textSize="10pt"
+            android:textSize="11sp"
             android:textStyle="bold"
-            android:layout_marginTop="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/description_layout"/>
+            app:layout_constraintTop_toBottomOf="@id/description_layout" />
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/store_layout"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_height="56dp"
+            android:layout_marginTop="6dp"
             app:layout_constraintTop_toBottomOf="@id/product_store_label"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
@@ -193,55 +270,27 @@
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/store_edit_text"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="56dp"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp"
+                android:textSize="13sp"
                 android:hint="Input the store where you bought the product"/>
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <!-- Product Purchase Date -->
-        <TextView
-            android:id="@+id/product_purchase_date_label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Purchase date"
-            android:textColor="@color/white"
-            android:textSize="10pt"
-            android:textStyle="bold"
-            android:layout_marginTop="16dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/store_layout"/>
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/purchase_date_layout"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            app:layout_constraintTop_toBottomOf="@id/product_purchase_date_label"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:errorEnabled="true"
-            app:endIconMode="custom"
-            app:endIconDrawable="@drawable/ic_calendar">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/purchase_date_edit_text"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="date"
-                android:hint="Input the purchase date of the product"
-                android:focusable="false"
-                android:clickable="true"/>
         </com.google.android.material.textfield.TextInputLayout>
 
         <!-- Save Product Button -->
         <Button
             android:id="@+id/save_button"
-            android:layout_width="143dp"
-            android:layout_height="54dp"
-            android:layout_marginTop="32dp"
-            android:text="Save"
+            android:layout_width="0dp"
+            android:layout_height="56dp"
+            android:layout_marginTop="28dp"
+            android:layout_marginBottom="16dp"
+            android:text="Save Product"
+            android:textSize="14sp"
+            android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/purchase_date_layout" />
+            app:layout_constraintTop_toBottomOf="@id/store_layout"
+            app:layout_constraintBottom_toBottomOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>
