@@ -18,8 +18,9 @@
             android:id="@+id/product_category_icon"
             android:layout_width="35dp"
             android:layout_height="35dp"
-            android:background="@drawable/ic_award_meal_black_24dp"
+            android:src="@drawable/ic_award_meal_black_24dp"
             android:contentDescription="Product icon"
+            android:scaleType="fitCenter"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
         <TextView

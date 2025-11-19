@@ -14,6 +14,6 @@
     <color name="card_background_dark">#33443A</color>
     <color name="card_background_expired">#A12727</color>
     <color name="card_background_used">#5D57534E</color>
-    <color name="checkbox_tint">#9057534E</color>
+    <color name="checkbox_tint">#121212</color>
 
 </resources>

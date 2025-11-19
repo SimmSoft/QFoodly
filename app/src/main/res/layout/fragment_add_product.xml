@@ -239,7 +239,7 @@
                 android:paddingTop="10dp"
                 android:textSize="13sp"
                 android:gravity="top"
-                android:hint="Input the description of the product"/>
+                android:hint=""/>
         </com.google.android.material.textfield.TextInputLayout>
 
         <!-- Product Store -->

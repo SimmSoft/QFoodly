@@ -24,8 +24,9 @@
             android:layout_width="70dp"
             android:layout_height="65dp"
             android:layout_marginEnd="8dp"
-            android:background="@drawable/ic_award_meal_black_24dp"
+            android:src="@drawable/ic_award_meal_black_24dp"
             android:contentDescription="Product icon"
+            android:scaleType="fitCenter"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
