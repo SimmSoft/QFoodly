@@ -64,8 +64,7 @@ public class SettingsFragment extends Fragment {
             if (result != null) {
                 if (result.success) {
                     if (result.processedCount > 0) {
-                        String message = String.format("Success! Processed: %d, Skipped: %d", 
-                            result.processedCount, result.skippedCount);
+                        String message = String.format("Success! Processed: %d", result.processedCount);
                         Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
                     } else {
                         Toast.makeText(getContext(), result.message, Toast.LENGTH_LONG).show();

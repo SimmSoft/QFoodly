@@ -10,7 +10,10 @@
     <color name="background">#F5F5F5</color>
     <color name="background_dark">#121212</color>
     <color name="secondary_dark">#1d1d1d</color>
-    <color name="card_background_dark">#303030</color>
-    <color name="card_background_expired">#CC4040</color>
-    <color name="card_background_used">#5A5A5A</color>
+
+    <color name="card_background_dark">#33443A</color>
+    <color name="card_background_expired">#A12727</color>
+    <color name="card_background_used">#5D57534E</color>
+    <color name="checkbox_tint">#9057534E</color>
+
 </resources>

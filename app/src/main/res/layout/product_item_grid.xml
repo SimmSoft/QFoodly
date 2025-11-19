@@ -73,7 +73,7 @@
             android:id="@+id/product_used_checkbox"
             android:layout_width="32dp"
             android:layout_height="33dp"
-            android:buttonTint="#666666"
+            android:buttonTint="@color/checkbox_tint"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.498"
