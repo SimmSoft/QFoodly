@@ -150,6 +150,28 @@ public class ProductDataSource {
                 ProductDbHelper.COLUMN_ID + " = " + id, null);
     }
 
+    public void upsertProduct(Product product) {
+        ContentValues values = new ContentValues();
+        values.put(ProductDbHelper.COLUMN_ID, product.getId());
+        values.put(ProductDbHelper.COLUMN_NAME, product.getName());
+        values.put(ProductDbHelper.COLUMN_PRICE, product.getPrice());
+        values.put(ProductDbHelper.COLUMN_EXPIRATION_DATE, product.getExpirationDate());
+        values.put(ProductDbHelper.COLUMN_CATEGORY, product.getCategory());
+        values.put(ProductDbHelper.COLUMN_DESCRIPTION, product.getDescription());
+        values.put(ProductDbHelper.COLUMN_STORE, product.getStore());
+        values.put(ProductDbHelper.COLUMN_PURCHASE_DATE, product.getPurchaseDate());
+        values.put(ProductDbHelper.COLUMN_IS_USED, product.isUsed() ? 1 : 0);
+
+        // Try to update first
+        int updatedRows = database.update(ProductDbHelper.TABLE_PRODUCTS, values,
+                ProductDbHelper.COLUMN_ID + " = " + product.getId(), null);
+
+        // If no rows were updated, insert instead
+        if (updatedRows == 0) {
+            database.insert(ProductDbHelper.TABLE_PRODUCTS, null, values);
+        }
+    }
+
     private Product cursorToProduct(Cursor cursor) {
         long id = cursor.getLong(0);
         String name = cursor.getString(1);

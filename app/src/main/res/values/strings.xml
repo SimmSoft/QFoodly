@@ -19,4 +19,27 @@
     <string name="image_view_item_transform_content_description">Represents an image view in the
         item
     </string>
+
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+    <string name="import_export_title">Data Settings</string>
+    <string name="export_products_csv">Export Products to CSV</string>
+    <string name="import_products_csv">Import Products from CSV</string>
+    <string name="export_products_json">Export Products to JSON</string>
+    <string name="import_products_json">Import Products from JSON</string>
+
+    <!-- Import/Export Messages -->
+    <string name="export_success">Products exported successfully to %s</string>
+    <string name="export_failed">Failed to export products: %s</string>
+    <string name="import_success">Products imported successfully. Processed: %d, Skipped: %d</string>
+    <string name="import_failed">Failed to import products: %s</string>
+    <string name="file_not_found">File not found</string>
+    <string name="invalid_file_format">Invalid file format</string>
+    <string name="permission_denied">Permission denied</string>
+    <string name="no_products_to_export">No products to export</string>
+
+    <!-- Icon descriptions -->
+    <string name="export_icon">Export icon</string>
+    <string name="import_icon">Import icon</string>
+    <string name="navigate_icon">Navigate icon</string>
 </resources>

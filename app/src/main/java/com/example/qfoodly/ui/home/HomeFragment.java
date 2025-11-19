@@ -106,7 +106,7 @@ public class HomeFragment extends Fragment {
 
         RecyclerView.ItemAnimator animator = binding.recyclerviewHome.getItemAnimator();
         if (animator instanceof DefaultItemAnimator) {
-            animator.setAddDuration(1200);
+            animator.setAddDuration(350);
         }
     }
 
