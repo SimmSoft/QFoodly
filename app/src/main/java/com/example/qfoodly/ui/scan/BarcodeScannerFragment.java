@@ -2,7 +2,9 @@ package com.example.qfoodly.ui.scan;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,6 +46,7 @@ public class BarcodeScannerFragment extends Fragment {
     private Camera camera;
     private ProcessCameraProvider cameraProvider;
     private boolean isScanning = true;
+    private MediaPlayer mediaPlayer;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -121,13 +124,16 @@ public class BarcodeScannerFragment extends Fragment {
                                         isScanning = false;
                                         Barcode barcode = barcodes.get(0);
                                         String scannedValue = barcode.getRawValue();
+                                        
+                                        // >>> TUTAJ DODAJ DŹWIĘK <<<
+                                        playScanSound();
+                                        
                                         onBarcodeScannerSuccess(scannedValue);
                                     }
                                 })
                                 .addOnFailureListener(e -> {
-                                    Toast.makeText(requireContext(),
-                                            "Error scanning: " + e.getMessage(),
-                                            Toast.LENGTH_SHORT).show();
+                                    // Loguj błąd zamiast pokazywać toast
+                                    Log.d("BarcodeScannerFragment", "Barcode scanning error: " + e.getMessage());
                                 });
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -169,11 +175,26 @@ public class BarcodeScannerFragment extends Fragment {
         Toast.makeText(requireContext(), cameraType, Toast.LENGTH_SHORT).show();
     }
 
-    private void onBarcodeScannerSuccess(String scannedBarcode) {
-        Toast.makeText(requireContext(),
-                "Scanned: " + scannedBarcode,
-                Toast.LENGTH_SHORT).show();
+    private void playScanSound() {
+        try {
+            // >>> MIEJSCE NA CUSTOM DŹWIĘK <<<
+            // Zamień R.raw.scan_sound na swoją ścieżkę do pliku audio
+            // Plik powinien być w: app/src/main/res/raw/scan_sound.mp3 (lub .wav, .ogg)
+            
+            mediaPlayer = MediaPlayer.create(requireContext(), R.raw.scan_sound);
+            if (mediaPlayer != null) {
+                mediaPlayer.setOnCompletionListener(mp -> {
+                    mp.release();
+                    mediaPlayer = null;
+                });
+                mediaPlayer.start();
+            }
+        } catch (Exception e) {
+            Log.e("BarcodeScannerFragment", "Error playing sound: " + e.getMessage());
+        }
+    }
 
+    private void onBarcodeScannerSuccess(String scannedBarcode) {
         // Przejście do AddProductFragment z kodem
         Bundle bundle = new Bundle();
         bundle.putString("scanned_barcode", scannedBarcode);
@@ -206,5 +227,9 @@ public class BarcodeScannerFragment extends Fragment {
             cameraProvider.unbindAll();
         }
         barcodeScanner.close();
+        if (mediaPlayer != null) {
+            mediaPlayer.release();
+            mediaPlayer = null;
+        }
     }
 }

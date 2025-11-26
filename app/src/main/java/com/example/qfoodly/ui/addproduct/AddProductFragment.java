@@ -4,6 +4,7 @@ import android.app.DatePickerDialog;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +17,13 @@ import androidx.navigation.fragment.NavHostFragment;
 import com.example.qfoodly.R;
 import com.example.qfoodly.data.Product;
 import com.example.qfoodly.data.ProductDataSource;
+import com.example.qfoodly.data.OpenFoodFactsClient;
+import com.example.qfoodly.data.OpenFoodFactsResponse;
 import com.example.qfoodly.databinding.FragmentAddProductBinding;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -50,8 +57,8 @@ public class AddProductFragment extends Fragment {
             // Obsługa skanowanego kodu kreskowego
             String scannedBarcode = getArguments().getString("scanned_barcode");
             if (scannedBarcode != null && !scannedBarcode.isEmpty()) {
-                binding.productNameEditText.setText(scannedBarcode);
-                Toast.makeText(getContext(), "Barcode: " + scannedBarcode, Toast.LENGTH_SHORT).show();
+                // Pobierz dane z Open Food Facts API
+                fetchProductFromAPI(scannedBarcode);
             }
         }
 
@@ -59,6 +66,69 @@ public class AddProductFragment extends Fragment {
         binding.saveButton.setOnClickListener(v -> saveProduct());
 
         return root;
+    }
+
+    private void fetchProductFromAPI(String barcode) {
+        // Pokaż loading (dezaktywuj save button)
+        binding.saveButton.setEnabled(false);
+        binding.saveButton.setAlpha(0.5f);
+        
+        // Wykonaj API call
+        OpenFoodFactsClient.getService().getProduct(barcode).enqueue(new Callback<OpenFoodFactsResponse>() {
+            @Override
+            public void onResponse(Call<OpenFoodFactsResponse> call, Response<OpenFoodFactsResponse> response) {
+                binding.saveButton.setEnabled(true);
+                binding.saveButton.setAlpha(1.0f);
+                
+                if (response.isSuccessful() && response.body() != null) {
+                    OpenFoodFactsResponse apiResponse = response.body();
+                    
+                    // Sprawdź czy produkt został znaleziony
+                    if (apiResponse.getStatus() == 1 && apiResponse.getProduct() != null) {
+                        populateFormFromAPI(apiResponse.getProduct());
+                        Toast.makeText(getContext(), "Produkt znaleziony! ✓", Toast.LENGTH_SHORT).show();
+                    } else {
+                        // Produkt nie znaleziony - wstaw tylko barcode
+                        binding.productNameEditText.setText(barcode);
+                        Toast.makeText(getContext(), "Produkt nie znaleziony w bazie. Uzupełnij ręcznie.", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    binding.productNameEditText.setText(barcode);
+                    Toast.makeText(getContext(), "Błąd połączenia z API", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<OpenFoodFactsResponse> call, Throwable t) {
+                binding.saveButton.setEnabled(true);
+                binding.saveButton.setAlpha(1.0f);
+                
+                Log.e("OpenFoodFacts", "API Error: " + t.getMessage());
+                binding.productNameEditText.setText(barcode);
+                Toast.makeText(getContext(), "Błąd pobierania danych", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void populateFormFromAPI(com.example.qfoodly.data.OpenFoodFactsProduct apiProduct) {
+        // Wstaw nazwę produktu
+        if (apiProduct.getProductName() != null && !apiProduct.getProductName().isEmpty()) {
+            binding.productNameEditText.setText(apiProduct.getProductName());
+        }
+        
+        // Wstaw kategorię
+        if (apiProduct.getCategories() != null && !apiProduct.getCategories().isEmpty()) {
+            // Weź pierwszą kategorię (może być rozdzielona przecinkami)
+            String[] categories = apiProduct.getCategories().split(",");
+            String mainCategory = categories[0].trim();
+            binding.categoryEditText.setText(mainCategory);
+        }
+        
+        // Wstaw kalorie do opisu (jeśli dostępne)
+        if (apiProduct.getEnergyKcal100g() != null) {
+            String description = "Kalorii na 100g: " + apiProduct.getEnergyKcal100g() + " kcal";
+            binding.descriptionEditText.setText(description);
+        }
     }
 
     private void populateFormWithProduct(Product product) {
