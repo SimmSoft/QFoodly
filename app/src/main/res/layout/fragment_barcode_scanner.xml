@@ -11,6 +11,12 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
+    <!-- Scanning Area Overlay -->
+    <com.example.qfoodly.ui.scan.ScanningOverlayView
+        android:id="@+id/scanning_overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
     <!-- Close Button (Top Left) -->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/close_btn"
