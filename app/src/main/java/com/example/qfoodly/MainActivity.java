@@ -15,6 +15,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.qfoodly.databinding.ActivityMainBinding;
 
+import androidx.core.content.ContextCompat;
+
 public class MainActivity extends AppCompatActivity {
 
     private AppBarConfiguration mAppBarConfiguration;
@@ -70,10 +72,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void onScanBarcodeClicked() {
-        // TODO: Implement barcode scanning functionality
-        // This can use ML Kit Barcode Scanning or other barcode libraries
-        // For now, just show a placeholder message
-        android.widget.Toast.makeText(this, "Barcode scan initiated", android.widget.Toast.LENGTH_SHORT).show();
+        NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment_content_main);
+        if (navHostFragment != null) {
+            NavController navController = navHostFragment.getNavController();
+            navController.navigate(R.id.nav_barcode_scanner);
+        }
     }
 
     @Override

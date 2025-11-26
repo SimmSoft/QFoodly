@@ -108,5 +108,19 @@
             android:name="isEdit"
             app:argType="boolean"
             android:defaultValue="false" />
+        <argument
+            android:name="scanned_barcode"
+            app:argType="string"
+            android:defaultValue="@null" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_barcode_scanner"
+        android:name="com.example.qfoodly.ui.scan.BarcodeScannerFragment"
+        android:label="Scan Barcode"
+        tools:layout="@layout/fragment_barcode_scanner" >
+        <action
+            android:id="@+id/action_nav_barcode_scanner_to_nav_add_product"
+            app:destination="@id/nav_add_product" />
     </fragment>
 </navigation>

@@ -46,6 +46,13 @@ public class AddProductFragment extends Fragment {
                 populateFormWithProduct(editingProduct);
                 binding.saveButton.setText("Update");
             }
+            
+            // Obsługa skanowanego kodu kreskowego
+            String scannedBarcode = getArguments().getString("scanned_barcode");
+            if (scannedBarcode != null && !scannedBarcode.isEmpty()) {
+                binding.productNameEditText.setText(scannedBarcode);
+                Toast.makeText(getContext(), "Barcode: " + scannedBarcode, Toast.LENGTH_SHORT).show();
+            }
         }
 
         setupDatePickers();
