@@ -16,6 +16,7 @@
 
 
     <string name="fab_content_description">Represents a view to invoke an action</string>
+    <string name="scan_barcode">Scan Barcode</string>
     <string name="image_view_item_transform_content_description">Represents an image view in the
         item
     </string>

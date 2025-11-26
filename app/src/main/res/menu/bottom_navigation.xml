@@ -14,6 +14,9 @@
             android:icon="@drawable/ic_recycling_black_24dp"
             android:title="@string/menu_deposit" />
         <item
+            android:id="@+id/nav_spacer"
+            android:enabled="false" />
+        <item
             android:id="@+id/nav_stats"
             android:icon="@drawable/ic_bar_chart_black_24dp"
             android:title="@string/menu_stats" />

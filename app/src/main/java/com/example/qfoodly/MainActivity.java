@@ -52,6 +52,8 @@ public class MainActivity extends AppCompatActivity {
                     .build();
             NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
             NavigationUI.setupWithNavController(bottomNavigationView, navController);
+            
+
         }
 
         TextView toolbarTitle = findViewById(R.id.toolbar_title);
@@ -60,6 +62,18 @@ public class MainActivity extends AppCompatActivity {
                 toolbarTitle.setText(destination.getLabel());
             }
         });
+
+        // Set up barcode scan button click listener
+        binding.appBarMain.contentMain.fabScanBarcodeContainer.setOnClickListener(view -> {
+            onScanBarcodeClicked();
+        });
+    }
+
+    private void onScanBarcodeClicked() {
+        // TODO: Implement barcode scanning functionality
+        // This can use ML Kit Barcode Scanning or other barcode libraries
+        // For now, just show a placeholder message
+        android.widget.Toast.makeText(this, "Barcode scan initiated", android.widget.Toast.LENGTH_SHORT).show();
     }
 
     @Override
