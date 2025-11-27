@@ -24,6 +24,7 @@ import androidx.core.content.ContextCompat;
 public class MainActivity extends AppCompatActivity {
 
     private AppBarConfiguration mAppBarConfiguration;
+    private boolean isNavigating = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +76,11 @@ public class MainActivity extends AppCompatActivity {
                 boolean showButton = destination.getId() == R.id.nav_home;
                 btnAddProduct.setVisibility(showButton ? android.view.View.VISIBLE : android.view.View.GONE);
             }
+            
+            // Reset navigation flag when leaving barcode scanner
+            if (destination.getId() != R.id.nav_barcode_scanner) {
+                isNavigating = false;
+            }
         });
 
         // Set up add product button click listener
@@ -91,6 +97,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void onScanBarcodeClicked() {
+        // Jeśli nawigacja jest już w trakcie, zignoruj kliknięcie
+        if (isNavigating) {
+            return;
+        }
+        
+        isNavigating = true;
+        
         // Sprawdź czy AddProductFragment ma niezapisane zmiany
         AddProductViewModel viewModel = new ViewModelProvider(this).get(AddProductViewModel.class);
         
@@ -113,6 +126,7 @@ public class MainActivity extends AppCompatActivity {
                 navigateToScanner();
             })
             .setNegativeButton("Wróć do edycji", (dialog, which) -> {
+                isNavigating = false; // Reset flag since navigation didn't happen
                 dialog.dismiss();
             })
             .setCancelable(false)
