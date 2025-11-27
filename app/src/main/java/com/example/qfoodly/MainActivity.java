@@ -137,6 +137,9 @@ public class MainActivity extends AppCompatActivity {
         NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment_content_main);
         if (navHostFragment != null) {
             NavController navController = navHostFragment.getNavController();
+            // Pop the current fragment (AddProductFragment) from the back stack
+            navController.popBackStack();
+            // Navigate to scanner
             navController.navigate(R.id.nav_barcode_scanner);
         }
     }

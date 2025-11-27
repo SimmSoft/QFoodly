@@ -59,6 +59,9 @@ dependencies {
     implementation("com.squareup.retrofit2:converter-gson:2.10.0")
     implementation("com.squareup.okhttp3:okhttp:4.11.0")
     
+    // Google Maps
+    implementation(libs.play.services.maps)
+    
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
