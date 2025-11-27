@@ -16,61 +16,44 @@
         android:id="@+id/scanning_overlay"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
-
-    <!-- Close Button (Top Left) -->
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/close_btn"
-        android:layout_width="56dp"
-        android:layout_height="56dp"
-        android:layout_gravity="top|start"
-        android:layout_margin="16dp"
-        android:padding="0dp"
-        app:cornerRadius="28dp"
-        app:icon="@android:drawable/ic_menu_close_clear_cancel"
-        app:iconSize="24dp"
-        app:iconTint="@android:color/white"
-        app:backgroundTint="@android:color/darker_gray" />
-
-    <!-- Toggle Camera Button (Top Right) -->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/toggle_camera_btn"
-        android:layout_width="wrap_content"
+        android:layout_width="56dp"
         android:layout_height="56dp"
-        android:layout_gravity="top|end"
-        android:layout_margin="16dp"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        android:text="Switch Camera"
-        android:textColor="@android:color/white"
-        android:textSize="12sp"
+        android:layout_marginLeft="350dp"
+        android:layout_marginTop="600dp"
+        android:insetLeft="0dp"
+        android:insetTop="0dp"
+        android:insetRight="0dp"
+        android:insetBottom="0dp"
+        android:padding="10dp"
+        app:backgroundTint="@color/primary_light"
         app:cornerRadius="28dp"
-        app:backgroundTint="@android:color/darker_gray" />
-
+        app:icon="@drawable/ic_camera_switch"
+        app:iconPadding="0dp"
+        app:iconSize="35dp"
+        app:iconTint="@android:color/white" />
     <!-- Scanning Indicator -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="124dp"
         android:layout_gravity="bottom"
         android:gravity="center_horizontal"
-        android:orientation="vertical"
+        android:orientation="horizontal"
         android:paddingVertical="32dp">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="0dp"
             android:text="Point camera at barcode"
             android:textColor="@android:color/white"
             android:textSize="16sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="8dp" />
+            android:textStyle="bold" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="EAN, UPC, Code 128/39 supported"
-            android:textColor="@android:color/white"
-            android:textSize="12sp"
-            android:alpha="0.7" />
+        <!-- Toggle Camera Button (Bottom Right) -->
+
+
     </LinearLayout>
 
 </FrameLayout>

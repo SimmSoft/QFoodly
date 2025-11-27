@@ -4,14 +4,19 @@ import android.app.DatePickerDialog;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.text.TextWatcher;
+import android.text.Editable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.qfoodly.R;
@@ -36,6 +41,8 @@ public class AddProductFragment extends Fragment {
     private ProductDataSource dataSource;
     private Product editingProduct = null;
     private boolean isEditMode = false;
+    private AddProductViewModel viewModel;
+    private TextWatcher textWatcher;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -44,6 +51,9 @@ public class AddProductFragment extends Fragment {
         View root = binding.getRoot();
 
         dataSource = new ProductDataSource(getContext());
+        
+        // Inicjalizuj ViewModel
+        viewModel = new ViewModelProvider(requireActivity()).get(AddProductViewModel.class);
 
         if (getArguments() != null) {
             editingProduct = getArguments().getParcelable("product");
@@ -63,12 +73,82 @@ public class AddProductFragment extends Fragment {
         }
 
         setupDatePickers();
+        setupChangeTracking();
         binding.saveButton.setOnClickListener(v -> saveProduct());
+        
+        // Obsługa back button
+        setupBackHandler();
 
         return root;
     }
 
+    private void setupChangeTracking() {
+        // Utwórz TextWatcher do śledzenia zmian
+        textWatcher = new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                viewModel.setHasUnsavedChanges(true);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        };
+
+        // Dodaj TextWatcher do wszystkich pól
+        binding.productNameEditText.addTextChangedListener(textWatcher);
+        binding.priceEditText.addTextChangedListener(textWatcher);
+        binding.expirationDateEditText.addTextChangedListener(textWatcher);
+        binding.categoryEditText.addTextChangedListener(textWatcher);
+        binding.descriptionEditText.addTextChangedListener(textWatcher);
+        binding.storeEditText.addTextChangedListener(textWatcher);
+        binding.purchaseDateEditText.addTextChangedListener(textWatcher);
+    }
+
+    private void setupBackHandler() {
+        OnBackPressedCallback callback = new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                // Sprawdź czy są niezapisane zmiany
+                if (viewModel.getHasUnsavedChanges().getValue() != null && 
+                    viewModel.getHasUnsavedChanges().getValue()) {
+                    showUnsavedChangesDialog();
+                } else {
+                    // Brak zmian - normalnie go back
+                    setEnabled(false);
+                    requireActivity().getOnBackPressedDispatcher().onBackPressed();
+                }
+            }
+        };
+        
+        requireActivity().getOnBackPressedDispatcher().addCallback(this, callback);
+    }
+
+    private void showUnsavedChangesDialog() {
+        new AlertDialog.Builder(requireContext())
+            .setTitle("Niezapisane zmiany")
+            .setMessage("Masz niezapisane dane. Co chcesz zrobić?")
+            .setPositiveButton("Zapisz", (dialog, which) -> {
+                saveProduct();
+            })
+            .setNegativeButton("Porzuć", (dialog, which) -> {
+                viewModel.clearUnsavedChanges();
+                NavHostFragment.findNavController(AddProductFragment.this)
+                    .popBackStack();
+            })
+            .setNeutralButton("Anuluj", (dialog, which) -> {
+                dialog.dismiss();
+            })
+            .setCancelable(false)
+            .show();
+    }
+
     private void fetchProductFromAPI(String barcode) {
+        // Sprawdź czy binding jest dostępny
+        if (binding == null) return;
+        
         // Pokaż loading (dezaktywuj save button)
         binding.saveButton.setEnabled(false);
         binding.saveButton.setAlpha(0.5f);
@@ -77,6 +157,9 @@ public class AddProductFragment extends Fragment {
         OpenFoodFactsClient.getService().getProduct(barcode).enqueue(new Callback<OpenFoodFactsResponse>() {
             @Override
             public void onResponse(Call<OpenFoodFactsResponse> call, Response<OpenFoodFactsResponse> response) {
+                // Sprawdź czy binding jest jeszcze dostępny
+                if (binding == null) return;
+                
                 binding.saveButton.setEnabled(true);
                 binding.saveButton.setAlpha(1.0f);
                 
@@ -86,7 +169,6 @@ public class AddProductFragment extends Fragment {
                     // Sprawdź czy produkt został znaleziony
                     if (apiResponse.getStatus() == 1 && apiResponse.getProduct() != null) {
                         populateFormFromAPI(apiResponse.getProduct());
-                        Toast.makeText(getContext(), "Produkt znaleziony! ✓", Toast.LENGTH_SHORT).show();
                     } else {
                         // Produkt nie znaleziony - wstaw tylko barcode
                         binding.productNameEditText.setText(barcode);
@@ -100,6 +182,9 @@ public class AddProductFragment extends Fragment {
 
             @Override
             public void onFailure(Call<OpenFoodFactsResponse> call, Throwable t) {
+                // Sprawdź czy binding jest jeszcze dostępny
+                if (binding == null) return;
+                
                 binding.saveButton.setEnabled(true);
                 binding.saveButton.setAlpha(1.0f);
                 
@@ -274,6 +359,9 @@ public class AddProductFragment extends Fragment {
             }
         }
 
+        // Wyczyść niezapisane zmiany
+        viewModel.clearUnsavedChanges();
+        
         playConfirmationSound();
         NavHostFragment.findNavController(this).navigate(R.id.action_nav_add_product_to_nav_home);
     }

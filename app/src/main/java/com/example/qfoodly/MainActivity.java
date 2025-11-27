@@ -1,6 +1,7 @@
 package com.example.qfoodly;
 
 import android.os.Bundle;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -12,8 +13,11 @@ import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AlertDialog;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.example.qfoodly.databinding.ActivityMainBinding;
+import com.example.qfoodly.ui.addproduct.AddProductViewModel;
 
 import androidx.core.content.ContextCompat;
 
@@ -59,11 +63,26 @@ public class MainActivity extends AppCompatActivity {
         }
 
         TextView toolbarTitle = findViewById(R.id.toolbar_title);
+        ImageButton btnAddProduct = binding.appBarMain.btnAddProductToolbar;
+        
         navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
             if (toolbarTitle != null) {
                 toolbarTitle.setText(destination.getLabel());
             }
+            
+            // Show Add Product button only on Home fragment
+            if (btnAddProduct != null) {
+                boolean showButton = destination.getId() == R.id.nav_home;
+                btnAddProduct.setVisibility(showButton ? android.view.View.VISIBLE : android.view.View.GONE);
+            }
         });
+
+        // Set up add product button click listener
+        if (btnAddProduct != null) {
+            btnAddProduct.setOnClickListener(view -> {
+                navController.navigate(R.id.action_nav_home_to_nav_add_product);
+            });
+        }
 
         // Set up barcode scan button click listener
         binding.appBarMain.contentMain.fabScanBarcodeContainer.setOnClickListener(view -> {
@@ -72,6 +91,35 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void onScanBarcodeClicked() {
+        // Sprawdź czy AddProductFragment ma niezapisane zmiany
+        AddProductViewModel viewModel = new ViewModelProvider(this).get(AddProductViewModel.class);
+        
+        if (viewModel.getHasUnsavedChanges().getValue() != null && 
+            viewModel.getHasUnsavedChanges().getValue()) {
+            // Ma niezapisane zmiany - pokaż dialog
+            showScanWithUnsavedChangesDialog(viewModel);
+        } else {
+            // Brak zmian - normalnie idź do skanera
+            navigateToScanner();
+        }
+    }
+
+    private void showScanWithUnsavedChangesDialog(AddProductViewModel viewModel) {
+        new AlertDialog.Builder(this)
+            .setTitle("Niezapisane zmiany")
+            .setMessage("Masz niezapisane dane w formularzu. Co chcesz zrobić?")
+            .setPositiveButton("Porzuć i skanuj nowy", (dialog, which) -> {
+                viewModel.clearUnsavedChanges();
+                navigateToScanner();
+            })
+            .setNegativeButton("Wróć do edycji", (dialog, which) -> {
+                dialog.dismiss();
+            })
+            .setCancelable(false)
+            .show();
+    }
+
+    private void navigateToScanner() {
         NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment_content_main);
         if (navHostFragment != null) {
             NavController navController = navHostFragment.getNavController();

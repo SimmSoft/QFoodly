@@ -23,9 +23,11 @@ import androidx.camera.view.PreviewView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.qfoodly.R;
+import com.example.qfoodly.ui.addproduct.AddProductViewModel;
 import com.google.android.material.button.MaterialButton;
 import com.google.mlkit.vision.barcode.Barcode;
 import com.google.mlkit.vision.barcode.BarcodeScanner;
@@ -42,7 +44,6 @@ public class BarcodeScannerFragment extends Fragment {
     private static final int CAMERA_PERMISSION_REQUEST_CODE = 100;
     private PreviewView previewView;
     private MaterialButton toggleCameraBtn;
-    private MaterialButton closeBtn;
     private BarcodeScanner barcodeScanner;
     private int currentCameraSelector = CameraSelector.LENS_FACING_BACK;
     private Camera camera;
@@ -50,8 +51,6 @@ public class BarcodeScannerFragment extends Fragment {
     private boolean isScanning = true;
     private MediaPlayer mediaPlayer;
     private ScanningOverlayView scanningOverlay;
-    private long scanStartTime = 0;
-    private int frameCount = 0;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -65,7 +64,6 @@ public class BarcodeScannerFragment extends Fragment {
 
         previewView = view.findViewById(R.id.preview_view);
         toggleCameraBtn = view.findViewById(R.id.toggle_camera_btn);
-        closeBtn = view.findViewById(R.id.close_btn);
         scanningOverlay = view.findViewById(R.id.scanning_overlay);
 
         // Konfiguracja ML Kit Barcode Scanner - ZOPTYMALIZOWANA dla szybkości
@@ -78,10 +76,6 @@ public class BarcodeScannerFragment extends Fragment {
         barcodeScanner = BarcodeScanning.getClient(options);
 
         toggleCameraBtn.setOnClickListener(v -> toggleCamera());
-        closeBtn.setOnClickListener(v -> closeScanner());
-        
-        scanStartTime = System.currentTimeMillis();
-        Log.d("BarcodeScanner", "=== SKANOWANIE ROZPOCZĘTE ===");
 
         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA)
                 == PackageManager.PERMISSION_GRANTED) {
@@ -114,11 +108,6 @@ public class BarcodeScannerFragment extends Fragment {
                         .build();
 
                 imageAnalysis.setAnalyzer(Executors.newSingleThreadExecutor(), imageProxy -> {
-                    frameCount++;
-                    if (frameCount % 30 == 0) {
-                        Log.d("BarcodeScanner", "Frame: " + frameCount + " | Czas: " + (System.currentTimeMillis() - scanStartTime) + "ms");
-                    }
-                    
                     if (!isScanning) {
                         imageProxy.close();
                         return;
@@ -137,12 +126,9 @@ public class BarcodeScannerFragment extends Fragment {
                                         isScanning = false;
                                         Barcode barcode = barcodes.get(0);
                                         String scannedValue = barcode.getRawValue();
-                                        long timeElapsed = System.currentTimeMillis() - scanStartTime;
                                         
-                                        Log.d("BarcodeScanner", "✓ BARCODE ZNALEZIONY! Czas: " + timeElapsed + "ms | Frames: " + frameCount);
-                                        Log.d("BarcodeScanner", "Wartość: " + scannedValue);
+                                        Log.d("BarcodeScanner", "✓ Barcode znaleziony: " + scannedValue);
                                         
-                                        Toast.makeText(requireContext(), "Barcode: " + scannedValue + " (" + timeElapsed + "ms)", Toast.LENGTH_LONG).show();
                                         playScanSound();
                                         onBarcodeScannerSuccess(scannedValue);
                                     }
@@ -212,7 +198,11 @@ public class BarcodeScannerFragment extends Fragment {
     }
 
     private void onBarcodeScannerSuccess(String scannedBarcode) {
-        // Przejście do AddProductFragment z kodem
+        // Normalnie przejdź do AddProductFragment
+        navigateToAddProduct(scannedBarcode);
+    }
+
+    private void navigateToAddProduct(String scannedBarcode) {
         Bundle bundle = new Bundle();
         bundle.putString("scanned_barcode", scannedBarcode);
 

@@ -72,7 +72,6 @@ public class HomeFragment extends Fragment {
         );
 
         setupRecyclerView();
-        setupFab();
         setupMenu();
         setupSortButton();
         setupSearch();
@@ -108,12 +107,6 @@ public class HomeFragment extends Fragment {
         if (animator instanceof DefaultItemAnimator) {
             animator.setAddDuration(350);
         }
-    }
-
-    private void setupFab() {
-        binding.fabAdd.setOnClickListener(v ->
-                NavHostFragment.findNavController(HomeFragment.this)
-                        .navigate(R.id.action_nav_home_to_nav_add_product));
     }
 
     private void setupMenu() {
